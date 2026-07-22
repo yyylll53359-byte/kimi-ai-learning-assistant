@@ -1,0 +1,15 @@
+# 永远不要上传真实密钥
+.env
+.env.*
+!.env.example
+
+# Python 临时文件
+__pycache__/
+*.pyc
+
+# 虚拟环境
+.venv/
+venv/
+
+# 私人聊天记录
+chat_history.json
