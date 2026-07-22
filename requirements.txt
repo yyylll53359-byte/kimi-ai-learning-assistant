@@ -1,3 +1,7 @@
 streamlit
 openai
 python-dotenv
+pypdf
+scikit-learn
+sentence-transformers
+chromadb

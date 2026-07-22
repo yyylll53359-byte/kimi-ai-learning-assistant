@@ -13,3 +13,12 @@ venv/
 
 # 私人聊天记录
 chat_history.json
+# 本地上传的文档
+data/
+
+# 本地向量数据库
+chroma_db/
+
+# Python临时文件
+__pycache__/
+*.pyc
