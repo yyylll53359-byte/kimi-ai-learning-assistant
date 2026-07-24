@@ -1,0 +1,62 @@
+[
+    {
+      "id": 1,
+      "question": "小林每天可以学习多少小时？",
+      "should_answer": true,
+      "keywords": ["四小时"]
+    },
+    {
+      "id": 2,
+      "question": "小林每天的学习时间怎样分配？",
+      "should_answer": true,
+      "keywords": ["第一小时", "第二", "第三", "第四小时"]
+    },
+    {
+      "id": 3,
+      "question": "第一周的学习目标是什么？",
+      "should_answer": true,
+      "keywords": ["PDF", "问答", "原型"]
+    },
+    {
+      "id": 4,
+      "question": "第二周准备增加哪些功能？",
+      "should_answer": true,
+      "keywords": ["向量检索", "来源展示", "评估"]
+    },
+    {
+      "id": 5,
+      "question": "RAG和Agent的主要区别是什么？",
+      "should_answer": true,
+      "keywords": ["资料", "工具"]
+    },
+    {
+      "id": 6,
+      "question": "项目需要关注哪些评估指标？",
+      "should_answer": true,
+      "keywords": ["检索命中率", "回答正确性", "依据", "响应时间"]
+    },
+    {
+      "id": 7,
+      "question": "小林的英语成绩是多少？",
+      "should_answer": false,
+      "keywords": []
+    },
+    {
+      "id": 8,
+      "question": "小林今年多少岁？",
+      "should_answer": false,
+      "keywords": []
+    },
+    {
+      "id": 9,
+      "question": "小林最喜欢吃什么？",
+      "should_answer": false,
+      "keywords": []
+    },
+    {
+      "id": 10,
+      "question": "小林住在哪个城市？",
+      "should_answer": false,
+      "keywords": []
+    }
+  ]

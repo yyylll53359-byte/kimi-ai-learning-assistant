@@ -1,0 +1,304 @@
+{
+    "summary": {
+        "total_questions": 10,
+        "answerable_questions": 6,
+        "unanswerable_questions": 4,
+        "retrieval_hit_rate": 100.0,
+        "answer_pass_rate": 100.0,
+        "refusal_pass_rate": 100.0,
+        "average_response_time_seconds": 0.76,
+        "distance_threshold": 1.25,
+        "distance_rejection_count": 4,
+        "api_call_count": 6
+    },
+    "details": [
+        {
+            "id": 1,
+            "question": "小林每天可以学习多少小时？",
+            "should_answer": true,
+            "keywords": [
+                "四小时"
+            ],
+            "retrieval_pass": true,
+            "found_in_context": [
+                "四小时"
+            ],
+            "top_distances": [
+                0.9089,
+                1.1371,
+                1.1534
+            ],
+            "best_distance": 0.9089,
+            "max_distance": 1.25,
+            "rejected_by_distance": false,
+            "answer": "小林每天可以学习四小时。",
+            "found_in_answer": [
+                "四小时"
+            ],
+            "answer_pass": true,
+            "refusal_pass": false,
+            "response_time_seconds": 1.04,
+            "error": null
+        },
+        {
+            "id": 2,
+            "question": "小林每天的学习时间怎样分配？",
+            "should_answer": true,
+            "keywords": [
+                "第一小时",
+                "第二",
+                "第三",
+                "第四小时"
+            ],
+            "retrieval_pass": true,
+            "found_in_context": [
+                "第一小时",
+                "第二",
+                "第三",
+                "第四小时"
+            ],
+            "top_distances": [
+                0.9639,
+                1.1403,
+                1.2392
+            ],
+            "best_distance": 0.9639,
+            "max_distance": 1.25,
+            "rejected_by_distance": false,
+            "answer": "小林每天可以学习四小时。第一小时用于理解概念和阅读代码；第二、第三小时用于开发项目；第四小时用于测试、记录问题和整理README。",
+            "found_in_answer": [
+                "第一小时",
+                "第二",
+                "第三",
+                "第四小时"
+            ],
+            "answer_pass": true,
+            "refusal_pass": false,
+            "response_time_seconds": 1.16,
+            "error": null
+        },
+        {
+            "id": 3,
+            "question": "第一周的学习目标是什么？",
+            "should_answer": true,
+            "keywords": [
+                "PDF",
+                "问答",
+                "原型"
+            ],
+            "retrieval_pass": true,
+            "found_in_context": [
+                "PDF",
+                "问答",
+                "原型"
+            ],
+            "top_distances": [
+                1.1218,
+                1.137,
+                1.1395
+            ],
+            "best_distance": 1.1218,
+            "max_distance": 1.25,
+            "rejected_by_distance": false,
+            "answer": "第一周的学习目标是完成可运行的 PDF 问答原型。\n\n当前文档中没有找到相关信息。",
+            "found_in_answer": [
+                "PDF",
+                "问答",
+                "原型"
+            ],
+            "answer_pass": true,
+            "refusal_pass": false,
+            "response_time_seconds": 0.91,
+            "error": null
+        },
+        {
+            "id": 4,
+            "question": "第二周准备增加哪些功能？",
+            "should_answer": true,
+            "keywords": [
+                "向量检索",
+                "来源展示",
+                "评估"
+            ],
+            "retrieval_pass": true,
+            "found_in_context": [
+                "向量检索",
+                "来源展示",
+                "评估"
+            ],
+            "top_distances": [
+                1.1321,
+                1.2915,
+                1.3293
+            ],
+            "best_distance": 1.1321,
+            "max_distance": 1.25,
+            "rejected_by_distance": false,
+            "answer": "根据提供的资料，第二周准备增加的功能包括：\n\n1. 向量检索：加入向量检索功能，以提高检索的效率和准确性。\n2. 来源展示：在回答页面显示来源片段，方便用户判断回答是否有依据。\n3. 基础评估：对检索和回答效果进行基础评估，以优化模型性能。\n\n当前文档中没有找到相关信息。",
+            "found_in_answer": [
+                "向量检索",
+                "来源展示",
+                "评估"
+            ],
+            "answer_pass": true,
+            "refusal_pass": false,
+            "response_time_seconds": 1.56,
+            "error": null
+        },
+        {
+            "id": 5,
+            "question": "RAG和Agent的主要区别是什么？",
+            "should_answer": true,
+            "keywords": [
+                "资料",
+                "工具"
+            ],
+            "retrieval_pass": true,
+            "found_in_context": [
+                "资料",
+                "工具"
+            ],
+            "top_distances": [
+                0.7778,
+                1.3724,
+                1.3839
+            ],
+            "best_distance": 0.7778,
+            "max_distance": 1.25,
+            "rejected_by_distance": false,
+            "answer": "RAG主要解决“去哪里找知识”的问题，它从文档、数据库或知识库中检索信息，再辅助模型回答。Agent主要解决“如何完成任务”的问题，Agent可以根据目标决定是否调用搜索、天气、邮件或数据库等工具，并根据工具结果继续行动。一个Agent也可以把RAG当作自己的知识检索工具。\n\n1. RAG用于从文档、数据库或知识库中检索信息，辅助模型回答。\n2. Agent负责根据目标调用搜索、天气、邮件或数据库等工具，并根据工具结果继续行动。",
+            "found_in_answer": [
+                "工具"
+            ],
+            "answer_pass": true,
+            "refusal_pass": false,
+            "response_time_seconds": 2.04,
+            "error": null
+        },
+        {
+            "id": 6,
+            "question": "项目需要关注哪些评估指标？",
+            "should_answer": true,
+            "keywords": [
+                "检索命中率",
+                "回答正确性",
+                "依据",
+                "响应时间"
+            ],
+            "retrieval_pass": true,
+            "found_in_context": [
+                "检索命中率",
+                "回答正确性",
+                "依据",
+                "响应时间"
+            ],
+            "top_distances": [
+                0.8516,
+                1.0152,
+                1.0988
+            ],
+            "best_distance": 0.8516,
+            "max_distance": 1.25,
+            "rejected_by_distance": false,
+            "answer": "项目需要关注的四个评估指标是：检索命中率、回答正确性、依据充分性和响应时间。",
+            "found_in_answer": [
+                "检索命中率",
+                "回答正确性",
+                "依据",
+                "响应时间"
+            ],
+            "answer_pass": true,
+            "refusal_pass": false,
+            "response_time_seconds": 0.91,
+            "error": null
+        },
+        {
+            "id": 7,
+            "question": "小林的英语成绩是多少？",
+            "should_answer": false,
+            "keywords": [],
+            "retrieval_pass": false,
+            "found_in_context": [],
+            "top_distances": [
+                1.3945,
+                1.4828,
+                1.525
+            ],
+            "best_distance": 1.3945,
+            "max_distance": 1.25,
+            "rejected_by_distance": true,
+            "answer": "当前文档中没有找到相关信息。",
+            "found_in_answer": [],
+            "answer_pass": true,
+            "refusal_pass": true,
+            "response_time_seconds": 0.0,
+            "error": null
+        },
+        {
+            "id": 8,
+            "question": "小林今年多少岁？",
+            "should_answer": false,
+            "keywords": [],
+            "retrieval_pass": false,
+            "found_in_context": [],
+            "top_distances": [
+                1.4821,
+                1.7728,
+                1.8219
+            ],
+            "best_distance": 1.4821,
+            "max_distance": 1.25,
+            "rejected_by_distance": true,
+            "answer": "当前文档中没有找到相关信息。",
+            "found_in_answer": [],
+            "answer_pass": true,
+            "refusal_pass": true,
+            "response_time_seconds": 0.0,
+            "error": null
+        },
+        {
+            "id": 9,
+            "question": "小林最喜欢吃什么？",
+            "should_answer": false,
+            "keywords": [],
+            "retrieval_pass": false,
+            "found_in_context": [],
+            "top_distances": [
+                1.7309,
+                1.8538,
+                1.8573
+            ],
+            "best_distance": 1.7309,
+            "max_distance": 1.25,
+            "rejected_by_distance": true,
+            "answer": "当前文档中没有找到相关信息。",
+            "found_in_answer": [],
+            "answer_pass": true,
+            "refusal_pass": true,
+            "response_time_seconds": 0.0,
+            "error": null
+        },
+        {
+            "id": 10,
+            "question": "小林住在哪个城市？",
+            "should_answer": false,
+            "keywords": [],
+            "retrieval_pass": false,
+            "found_in_context": [],
+            "top_distances": [
+                1.6307,
+                1.8618,
+                1.9222
+            ],
+            "best_distance": 1.6307,
+            "max_distance": 1.25,
+            "rejected_by_distance": true,
+            "answer": "当前文档中没有找到相关信息。",
+            "found_in_answer": [],
+            "answer_pass": true,
+            "refusal_pass": true,
+            "response_time_seconds": 0.0,
+            "error": null
+        }
+    ]
+}

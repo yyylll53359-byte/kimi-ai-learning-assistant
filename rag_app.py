@@ -29,10 +29,27 @@ st.write(
 
 
 # =========================
-# 2. 读取API Key
+# 2. RAG参数设置
 # =========================
 
-env_path = Path.home() / "AI-Secrets" / ".env"
+CHUNK_SIZE = 300
+CHUNK_OVERLAP = 50
+TOP_COUNT = 3
+
+# 向量距离越小，代表内容越相关
+# 超过这个距离就直接拒绝回答
+MAX_DISTANCE = 1.25
+
+
+# =========================
+# 3. 读取API Key
+# =========================
+
+env_path = (
+    Path.home()
+    / "AI-Secrets"
+    / ".env"
+)
 
 load_dotenv(
     dotenv_path=env_path
@@ -47,11 +64,12 @@ if not api_key:
         "没有读取到KIMI_API_KEY，"
         "请检查AI-Secrets中的.env。"
     )
+
     st.stop()
 
 
 # =========================
-# 3. 创建Kimi客户端
+# 4. 创建Kimi客户端
 # =========================
 
 client = OpenAI(
@@ -61,7 +79,7 @@ client = OpenAI(
 
 
 # =========================
-# 4. 加载Embedding模型
+# 5. 加载Embedding模型
 # =========================
 
 @st.cache_resource
@@ -76,7 +94,7 @@ embedding_model = load_embedding_model()
 
 
 # =========================
-# 5. 创建Chroma数据库
+# 6. 创建Chroma数据库
 # =========================
 
 @st.cache_resource
@@ -102,13 +120,13 @@ collection = (
 
 
 # =========================
-# 6. 文本切分函数
+# 7. 文本切分函数
 # =========================
 
 def split_text(
     text,
-    chunk_size=300,
-    overlap=50
+    chunk_size=CHUNK_SIZE,
+    overlap=CHUNK_OVERLAP
 ):
     chunks = []
 
@@ -130,7 +148,7 @@ def split_text(
 
 
 # =========================
-# 7. 生成文档向量
+# 8. 生成文档向量
 # =========================
 
 @st.cache_data(
@@ -146,7 +164,7 @@ def create_embeddings(
 
 
 # =========================
-# 8. 上传PDF
+# 9. 上传PDF
 # =========================
 
 uploaded_file = st.file_uploader(
@@ -175,11 +193,12 @@ if uploaded_file:
         st.error(
             "PDF读取失败，请确认文件没有损坏。"
         )
+
         st.stop()
 
 
     # =========================
-    # 9. 提取PDF文字
+    # 10. 提取PDF文字
     # =========================
 
     full_text = ""
@@ -205,11 +224,12 @@ if uploaded_file:
             "这份PDF可能是扫描图片，"
             "需要使用OCR。"
         )
+
         st.stop()
 
 
     # =========================
-    # 10. 切分文档
+    # 11. 切分文档
     # =========================
 
     chunks = split_text(
@@ -225,7 +245,7 @@ if uploaded_file:
 
 
     # =========================
-    # 11. 将文档写入Chroma
+    # 12. 将文档写入Chroma
     # =========================
 
     with st.spinner(
@@ -276,7 +296,7 @@ if uploaded_file:
 
 
     # =========================
-    # 12. 用户提问
+    # 13. 用户提问
     # =========================
 
     question = st.chat_input(
@@ -293,7 +313,7 @@ if uploaded_file:
 
 
         # =========================
-        # 13. 查询Chroma
+        # 14. 查询Chroma
         # =========================
 
         with st.spinner(
@@ -306,8 +326,8 @@ if uploaded_file:
                 ).tolist()
             )
 
-            top_count = min(
-                3,
+            result_count = min(
+                TOP_COUNT,
                 len(chunks)
             )
 
@@ -315,7 +335,7 @@ if uploaded_file:
                 query_embeddings=[
                     question_embedding
                 ],
-                n_results=top_count,
+                n_results=result_count,
                 where={
                     "file_id": file_id
                 },
@@ -341,11 +361,43 @@ if uploaded_file:
 
 
         if not retrieved_chunks:
-            st.error(
-                "向量数据库中没有找到相关内容。"
+            st.chat_message(
+                "assistant"
+            ).write(
+                "当前文档中没有找到相关信息。"
             )
+
             st.stop()
 
+
+        # =========================
+        # 15. 检索距离保护
+        # =========================
+
+        best_distance = float(
+            distances[0]
+        )
+
+        if best_distance > MAX_DISTANCE:
+            st.chat_message(
+                "assistant"
+            ).write(
+                "当前文档中没有找到相关信息。"
+            )
+
+            st.info(
+                f"最佳检索距离为 "
+                f"{best_distance:.3f}，"
+                f"超过拒答阈值 "
+                f"{MAX_DISTANCE}。"
+            )
+
+            st.stop()
+
+
+        # =========================
+        # 16. 整理检索资料
+        # =========================
 
         context_parts = []
 
@@ -363,7 +415,7 @@ if uploaded_file:
 
 
         # =========================
-        # 14. 调用Kimi
+        # 17. 调用Kimi
         # =========================
 
         with st.spinner(
@@ -384,9 +436,12 @@ if uploaded_file:
                                 "content": (
                                     "你是一名文档问答助手。"
                                     "只能根据提供的资料回答问题。"
-                                    "不要使用资料之外的信息。"
-                                    "如果资料中没有答案，"
-                                    "请回答："
+                                    "禁止使用资料之外的信息。"
+                                    "禁止根据常识进行猜测。"
+                                    "只有资料明确写出答案时，"
+                                    "才可以回答。"
+                                    "如果资料没有明确答案，"
+                                    "必须回答："
                                     "当前文档中没有找到相关信息。"
                                 )
                             },
@@ -403,7 +458,12 @@ if uploaded_file:
 
 {question}
 
-请根据资料给出简洁、准确的答案。
+请先判断资料中是否明确包含答案。
+
+如果包含，请给出简洁、准确的回答。
+
+如果不包含，只回答：
+当前文档中没有找到相关信息。
 """
                             }
                         ]
@@ -414,6 +474,7 @@ if uploaded_file:
                 st.error(
                     f"调用Kimi失败：{error}"
                 )
+
                 st.stop()
 
 
@@ -426,7 +487,7 @@ if uploaded_file:
 
 
         # =========================
-        # 15. 显示答案
+        # 18. 显示答案
         # =========================
 
         st.chat_message(
@@ -437,7 +498,7 @@ if uploaded_file:
 
 
         # =========================
-        # 16. 显示回答依据
+        # 19. 显示回答依据
         # =========================
 
         st.subheader(
