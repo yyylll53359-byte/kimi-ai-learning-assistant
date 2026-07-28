@@ -2,6 +2,12 @@
 
 基于 Python、Streamlit、Kimi API、Sentence Transformers 和 Chroma 构建的 AI 学习助手与 PDF 知识库问答项目。
 
+## 在线体验
+
+PDF知识库助手：
+
+https://yyylll53359-byte-kimi-ai-learning-assistant-rag-app-x6hvqk.streamlit.app/
+
 项目仓库：
 
 https://github.com/yyylll53359-byte/kimi-ai-learning-assistant
@@ -32,6 +38,7 @@ https://github.com/yyylll53359-byte/kimi-ai-learning-assistant
 - 使用距离阈值拦截低相关问题
 - 文档没有答案时拒绝编造
 - 使用固定测试题自动评测RAG效果
+- 部署到Streamlit Community Cloud供公开体验
 
 ## RAG工作流程
 
@@ -64,6 +71,7 @@ pypdf逐页提取文字
 
 - Python 3.11
 - Streamlit
+- Streamlit Community Cloud
 - Kimi API
 - OpenAI Python SDK
 - Sentence Transformers
@@ -132,6 +140,8 @@ macOS或Linux示例位置：
 KIMI_API_KEY=your_api_key_here
 ```
 
+部署到Streamlit Community Cloud时，通过应用的Secrets设置保存`KIMI_API_KEY`，真实密钥不会提交到GitHub。
+
 请勿将真实API Key上传到GitHub。
 
 ## 运行AI学习助手
@@ -149,7 +159,7 @@ python -m streamlit run rag_app.py
 打开网页后：
 
 1. 上传一份可以选择文字的PDF。
-2. 等待系统建立本地向量知识库。
+2. 等待系统建立向量知识库。
 3. 输入与文档有关的问题。
 4. 查看AI回答及对应的PDF页码、文本块和向量距离。
 5. 当检索距离过大时，系统会拒绝回答。
@@ -275,6 +285,42 @@ python eval_rag.py
 
 以上测试证明：页码能够随文本块写入向量数据库，并在查询后正确返回；同时，第5天增加的距离拒答功能仍然有效。
 
+## Day 7在线部署验收
+
+项目已部署到Streamlit Community Cloud：
+
+https://yyylll53359-byte-kimi-ai-learning-assistant-rag-app-x6hvqk.streamlit.app/
+
+部署配置：
+
+```text
+GitHub仓库：yyylll53359-byte/kimi-ai-learning-assistant
+分支：main
+入口文件：rag_app.py
+Python版本：3.11
+API Key：通过Streamlit Secrets安全配置
+```
+
+线上功能验收：
+
+```text
+PDF上传：通过
+文字提取与切分：通过
+Embedding模型加载：通过
+Chroma向量写入与检索：通过
+Kimi回答生成：通过
+PDF页码与来源展示：通过
+无痕窗口公开访问：通过
+```
+
+测试问题：
+
+```text
+RAG的五个核心步骤是什么？
+```
+
+线上系统正确回答了PDF解析、文本切分、检索、生成和效果评估，并展示了对应的PDF页码、文本块与向量距离。
+
 ## 项目亮点
 
 - 独立完成从PDF解析到网页问答的完整RAG链路。
@@ -288,6 +334,7 @@ python eval_rag.py
 - 使用距离阈值在调用大模型前拦截低相关问题。
 - 在提高准确率的同时减少Kimi API调用次数。
 - 将API Key、用户文档和本地向量数据库排除在公开仓库之外。
+- 完成Streamlit Community Cloud部署，提供可公开访问的产品演示链接。
 
 ## 当前局限
 
@@ -298,7 +345,8 @@ python eval_rag.py
 - 暂不支持扫描图片型PDF。
 - 页码溯源暂时不能定位到页面中的具体段落或坐标。
 - 尚未加入Reranker重新排序。
-- 尚未部署为公开访问的在线产品。
+- 云端实例重启后可能需要重新上传PDF并建立知识库。
+- 首次加载Embedding模型时可能需要等待。
 
 ## 后续计划
 
@@ -309,9 +357,7 @@ python eval_rag.py
 - 增加用户反馈和日志统计
 - 增加Agent工具调用能力
 - 增加人工评分或大模型评分
-- 部署为可公开访问的演示项目
 
 ## 项目性质
 
 个人AI应用学习与实践项目。
-      
