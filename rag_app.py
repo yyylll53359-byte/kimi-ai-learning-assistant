@@ -31,7 +31,7 @@ MAX_DISTANCE = 1.25
 
 
 # =========================
-# 2. 加载外部 API Key
+# 2. 加载 API Key
 # =========================
 
 env_path = Path.home() / "AI-Secrets" / ".env"
@@ -40,7 +40,7 @@ load_dotenv(dotenv_path=env_path)
 api_key = os.getenv("KIMI_API_KEY")
 
 if not api_key:
-    st.error("没有读取到 KIMI_API_KEY，请检查 AI-Secrets 文件夹中的 .env。")
+    st.error("没有读取到 KIMI_API_KEY，请检查 API Key 配置。")
     st.stop()
 
 client = OpenAI(
@@ -50,7 +50,7 @@ client = OpenAI(
 
 
 # =========================
-# 3. 加载嵌入模型和 Chroma
+# 3. 加载向量模型和 Chroma
 # =========================
 
 @st.cache_resource
@@ -63,6 +63,7 @@ def load_embedding_model():
 @st.cache_resource
 def load_chroma_collection():
     chroma_client = chromadb.PersistentClient(path="chroma_db")
+
     return chroma_client.get_or_create_collection(
         name="pdf_knowledge_base"
     )
@@ -73,7 +74,7 @@ collection = load_chroma_collection()
 
 
 # =========================
-# 4. 文本处理函数
+# 4. 工具函数
 # =========================
 
 def split_text(
@@ -110,11 +111,38 @@ def create_embeddings(text_chunks):
         text_chunks,
         normalize_embeddings=True,
     )
+
     return vectors.tolist()
 
 
+def split_answer(answer):
+    """
+    将模型回答拆成：
+    1. 一句话结论
+    2. 详细说明
+    """
+
+    conclusion = answer.strip()
+    details = ""
+
+    if "【详细说明】" in answer:
+        conclusion, details = answer.split(
+            "【详细说明】",
+            maxsplit=1,
+        )
+
+    conclusion = conclusion.replace(
+        "【一句话结论】",
+        "",
+    ).strip()
+
+    details = details.strip()
+
+    return conclusion, details
+
+
 # =========================
-# 5. 上传并读取 PDF
+# 5. 上传 PDF
 # =========================
 
 uploaded_file = st.file_uploader(
@@ -137,7 +165,7 @@ except Exception as error:
 
 
 # =========================
-# 6. 按页提取并切分文本
+# 6. 解析并切分 PDF
 # =========================
 
 full_text_parts = []
@@ -151,6 +179,7 @@ for page_number, page in enumerate(reader.pages, start=1):
         continue
 
     pages_with_text += 1
+
     full_text_parts.append(
         f"--- 第 {page_number} 页 ---\n{page_text}"
     )
@@ -173,13 +202,19 @@ full_text = "\n\n".join(full_text_parts)
 chunks = [record["text"] for record in chunk_records]
 
 if not chunks:
-    st.error("没有提取到可用文字。若 PDF 是扫描件，需要先进行 OCR。")
+    st.error(
+        "没有读取到可用文字。这个 PDF 可能是扫描件或图片版。"
+    )
+    st.info(
+        "建议上传文字版 PDF，或先使用 OCR 工具将扫描件转成可搜索文本。"
+    )
     st.stop()
 
 st.success(
     f"读取成功：共 {len(reader.pages)} 页，"
     f"其中 {pages_with_text} 页提取到文字，"
-    f"共 {len(full_text)} 个字符，切分为 {len(chunks)} 个文本块。"
+    f"共提取 {len(full_text)} 个字符，"
+    f"切分为 {len(chunks)} 个文本块。"
 )
 
 with st.expander("查看提取的部分文字"):
@@ -187,13 +222,12 @@ with st.expander("查看提取的部分文字"):
 
 
 # =========================
-# 7. 建立当前 PDF 的向量知识库
+# 7. 建立当前 PDF 的知识库
 # =========================
 
 with st.spinner("正在建立向量知识库..."):
     chunk_embeddings = create_embeddings(chunks)
 
-    # 删除这个 PDF 以前的旧记录，防止旧数据没有页码。
     collection.delete(
         where={"file_id": file_id}
     )
@@ -229,14 +263,18 @@ with st.spinner("正在建立向量知识库..."):
         metadatas=metadatas,
     )
 
-st.info(f"知识库已建立：当前 PDF 共保存 {len(chunks)} 个向量。")
+st.info(
+    f"知识库已建立：当前 PDF 共保存 {len(chunks)} 个向量。"
+)
 
 
 # =========================
-# 8. 用户提问和语义检索
+# 8. 用户提问与检索
 # =========================
 
-question = st.chat_input("请输入一个与 PDF 内容有关的问题...")
+question = st.chat_input(
+    "请输入一个与 PDF 内容有关的问题..."
+)
 
 if question:
     st.chat_message("user").write(question)
@@ -262,15 +300,16 @@ if question:
 
     best_distance = retrieved_distances[0]
 
-    # 距离越小，代表问题与文本越相似。
     if best_distance > MAX_DISTANCE:
         st.chat_message("assistant").write(
             "当前文档中没有找到相关信息。"
         )
+
         st.warning(
             f"最相关文本的向量距离为 {best_distance:.3f}，"
             f"超过拒答阈值 {MAX_DISTANCE:.2f}。"
         )
+
         st.stop()
 
 
@@ -305,13 +344,16 @@ if question:
                 {
                     "role": "system",
                     "content": (
-                        "你是一名严格的文档问答助手。"
-                        "只能根据用户提供的资料回答问题。"
-                        "如果资料能够支持答案，即使用户问题和资料说法不同，"
-                        "也要根据资料组织答案。"
-                        "禁止使用资料之外的信息，也不要依靠常识猜测。"
-                        "如果资料不能支持答案，必须只回答："
-                        "当前文档中没有找到相关信息。"
+                        "你是一名严格的 PDF 文档问答助手。"
+                        "只能根据用户提供的资料回答问题，"
+                        "不能使用资料之外的信息或常识猜测。"
+                        "如果资料无法支持答案，只能回答："
+                        "当前文档中没有找到相关信息。\n\n"
+                        "请严格按以下格式回答：\n"
+                        "【一句话结论】\n"
+                        "先用一句简短的话直接回答用户。\n\n"
+                        "【详细说明】\n"
+                        "再用 1 到 3 点解释答案。"
                     ),
                 },
                 {
@@ -319,18 +361,30 @@ if question:
                     "content": (
                         f"问题：\n{question}\n\n"
                         f"可用资料：\n{context}\n\n"
-                        "请根据以上资料回答。"
+                        "请严格根据以上资料回答。"
                     ),
                 },
             ],
         )
 
     answer = response.choices[0].message.content
-    st.chat_message("assistant").write(answer)
+    conclusion, details = split_answer(answer)
 
 
     # =========================
-    # 11. 展示答案来源和 PDF 页码
+    # 11. 产品化展示答案
+    # =========================
+
+    with st.chat_message("assistant"):
+        st.markdown(f"**结论：** {conclusion}")
+
+        if details:
+            with st.expander("查看详细说明"):
+                st.markdown(details)
+
+
+    # =========================
+    # 12. 展示答案来源
     # =========================
 
     st.subheader("回答依据")
